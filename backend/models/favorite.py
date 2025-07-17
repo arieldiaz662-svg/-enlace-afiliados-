@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 from bson import ObjectId
+from typing import Any
 
 
 class PyObjectId(ObjectId):
@@ -15,8 +16,8 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type='string')
+    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler) -> dict:
+        return {'type': 'string'}
 
 
 class Favorite(BaseModel):
@@ -25,18 +26,20 @@ class Favorite(BaseModel):
     product_id: PyObjectId = Field(alias="productId")
     created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
 
 
 class FavoriteCreate(BaseModel):
     user_id: str = Field(alias="userId")
     product_id: str = Field(alias="productId")
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }
 
 
 class FavoriteResponse(BaseModel):
@@ -45,5 +48,6 @@ class FavoriteResponse(BaseModel):
     productId: str
     createdAt: datetime
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }

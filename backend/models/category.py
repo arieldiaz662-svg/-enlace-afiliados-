@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Any
 from datetime import datetime
 from bson import ObjectId
 
@@ -16,8 +16,8 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type='string')
+    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler) -> dict:
+        return {'type': 'string'}
 
 
 class TranslatedField(BaseModel):
@@ -33,10 +33,11 @@ class Category(BaseModel):
     is_active: bool = Field(default=True, alias="isActive")
     created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
 
 
 class CategoryCreate(BaseModel):
@@ -45,8 +46,9 @@ class CategoryCreate(BaseModel):
     icon: str
     is_active: bool = Field(default=True, alias="isActive")
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }
 
 
 class CategoryResponse(BaseModel):
@@ -56,5 +58,6 @@ class CategoryResponse(BaseModel):
     isActive: bool
     createdAt: datetime
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }

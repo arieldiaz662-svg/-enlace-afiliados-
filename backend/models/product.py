@@ -10,13 +10,13 @@ class PyObjectId(ObjectId):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, info=None):
         if not ObjectId.is_valid(v):
             raise ValueError('Invalid objectid')
         return ObjectId(v)
 
     @classmethod
-    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler) -> dict:
+    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler=None) -> dict:
         return {'type': 'string'}
 
 

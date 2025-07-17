@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from bson import ObjectId
 
@@ -16,8 +16,8 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type='string')
+    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler) -> dict:
+        return {'type': 'string'}
 
 
 class TranslatedField(BaseModel):
@@ -41,10 +41,11 @@ class Product(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
     updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updatedAt")
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
 
 
 class ProductCreate(BaseModel):
@@ -60,8 +61,9 @@ class ProductCreate(BaseModel):
     features: Dict[str, List[str]]
     is_active: bool = Field(default=True, alias="isActive")
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }
 
 
 class ProductUpdate(BaseModel):
@@ -78,8 +80,9 @@ class ProductUpdate(BaseModel):
     is_active: Optional[bool] = Field(None, alias="isActive")
     updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updatedAt")
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }
 
 
 class ProductResponse(BaseModel):
@@ -98,5 +101,6 @@ class ProductResponse(BaseModel):
     createdAt: datetime
     updatedAt: datetime
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True
+    }

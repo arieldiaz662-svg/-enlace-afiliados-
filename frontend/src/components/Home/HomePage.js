@@ -1,39 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
-import { products, categories } from '../../data/mock';
-import { Star, ExternalLink, Heart, Filter, Leaf, Recycle, Award, Shield } from 'lucide-react';
+import { useProducts } from '../../hooks/useProducts';
+import { useCategories } from '../../hooks/useCategories';
+import { useFavorites } from '../../hooks/useFavorites';
+import { Star, ExternalLink, Heart, Filter, Leaf, Recycle, Award, Shield, Loader2 } from 'lucide-react';
 
 const HomePage = () => {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('bambugoods-favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const currentProducts = products[language];
-  const currentCategories = categories[language];
-
-  useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredProducts(currentProducts);
-    } else {
-      setFilteredProducts(currentProducts.filter(product => product.category === selectedCategory));
-    }
-  }, [selectedCategory, currentProducts]);
-
-  useEffect(() => {
-    localStorage.setItem('bambugoods-favorites', JSON.stringify(favorites));
-  }, [favorites]);
-
-  const toggleFavorite = (productId) => {
-    setFavorites(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const { products, loading: productsLoading, error: productsError } = useProducts(selectedCategory, language, searchTerm);
+  const { categories, loading: categoriesLoading } = useCategories(language);
+  const { favorites, toggleFavorite, isFavorite, loading: favoritesLoading } = useFavorites();
 
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
@@ -73,12 +52,28 @@ const HomePage = () => {
               <span className="text-green-700 font-medium">{t('plasticFree')}</span>
             </div>
           </div>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl">
+          <button 
+            onClick={() => setSelectedCategory('all')}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
+          >
             {t('allProducts')}
           </button>
         </div>
       </div>
     </section>
+  );
+
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <span className="ml-2 text-green-700">{t('loading')}</span>
+    </div>
+  );
+
+  const ErrorMessage = ({ message }) => (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <p className="text-red-700">{message}</p>
+    </div>
   );
 
   const ProductCard = ({ product }) => (
@@ -88,12 +83,16 @@ const HomePage = () => {
           src={product.image} 
           alt={product.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/300x300?text=BambuGoods';
+          }}
         />
         <button
           onClick={() => toggleFavorite(product.id)}
-          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-200"
+          disabled={favoritesLoading}
+          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-200 disabled:opacity-50"
         >
-          <Heart className={`h-5 w-5 ${favorites.includes(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+          <Heart className={`h-5 w-5 ${isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
         </button>
         <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
           {t('ecoFriendly')}
@@ -119,8 +118,8 @@ const HomePage = () => {
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-green-600">{product.price}</span>
-            <span className="text-sm text-gray-500 line-through">{product.originalPrice}</span>
+            <span className="text-2xl font-bold text-green-600">€{product.price}</span>
+            <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
           </div>
         </div>
         
@@ -158,31 +157,39 @@ const HomePage = () => {
               <Filter className="h-5 w-5 text-gray-600" />
               <span className="text-gray-700 font-medium">{t('filterBy')}:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-full font-medium transition-colors duration-200 ${
-                  selectedCategory === 'all'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {t('allCategories')}
-              </button>
-              {currentCategories.map((category) => (
+            
+            {categoriesLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin text-green-600" />
+                <span className="text-gray-500">Cargando categorías...</span>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => setSelectedCategory('all')}
                   className={`px-4 py-2 rounded-full font-medium transition-colors duration-200 ${
-                    selectedCategory === category.id
+                    selectedCategory === 'all'
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {category.name}
+                  {t('allCategories')}
                 </button>
-              ))}
-            </div>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-4 py-2 rounded-full font-medium transition-colors duration-200 ${
+                      selectedCategory === category.id
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -194,13 +201,17 @@ const HomePage = () => {
             {selectedCategory === 'all' ? t('allProducts') : t('featuredProducts')}
           </h2>
           
-          {filteredProducts.length === 0 ? (
+          {productsError && <ErrorMessage message={productsError} />}
+          
+          {productsLoading ? (
+            <LoadingSpinner />
+          ) : products.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">{t('noResults')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

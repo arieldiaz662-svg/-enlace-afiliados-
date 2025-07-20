@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BambuGoods - Higiene Personal Eco</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8f4;
+      color: #2d4739;
+    }
+    header {
+      background-color: #b5d3c5;
+      padding: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header p {
+      font-size: 1.2rem;
+    }
+    nav {
+      background-color: #d8efe3;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: #2d4739;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    article {
+      background: white;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    h2 {
+      color: #1e3d31;
+    }
+    .product {
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid #d0e3db;
+      border-radius: 0.5rem;
+    }
+    .product a {
+      display: inline-block;
+      margin-top: 0.5rem;
+      background-color: #2d4739;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background-color: #eaf5ee;
+      color: #888;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BambuGoods</h1>
+    <p>Higiene personal eco-sostenible sin plásticos ni químicos</p>
+  </header>
+
+  <nav>
+    <a href="#">Cepillos de bambú</a>
+    <a href="#">Champús sólidos</a>
+    <a href="#">Cuidado facial</a>
+    <a href="#">Kits sostenibles</a>
+    <a href="#">Blog</a>
+  </nav>
+
+  <main>
+    <article>
+      <h2>Los 5 mejores cepillos de dientes de bambú en 2025</h2>
+      <p>¿Estás buscando una alternativa ecológica a los cepillos de plástico? Aquí te presentamos los mejores cepillos de bambú del 2025 según calidad, sostenibilidad y opiniones.</p>
+
+      <div class="product">
+        <h3>1. Cepillo de Bambú Humble Co.</h3>
+        <p>Cerdas suaves, certificado cruelty-free y empaquetado sin plástico.</p>
+        <a href="https://www.amazon.es/dp/B0829FNN5V?tag=bambugoods-21" target="_blank">Ver en Amazon</a>
+      </div>
+
+      <div class="product">
+        <h3>2. Cepillo Natural de EcoBamboo</h3>
+        <p>Mango ergonómico, ideal para adultos y niños, biodegradables al 95%.</p>
+        <a href="https://www.amazon.es/dp/B07C5TC92T?tag=bambugoods-21" target="_blank">Ver en Amazon</a>
+      </div>
+
+      <div class="product">
+        <h3>3. Set Familiar de Greenzla</h3>
+        <p>Pack de 6 cepillos, buena relación calidad-precio y empaque reciclado.</p>
+        <a href="https://www.amazon.es/dp/B07Q2D9C77?tag=bambugoods-21" target="_blank">Ver en Amazon</a>
+      </div>
+
+      <div class="product">
+        <h3>4. Cepillo de Bambú Isshah</h3>
+        <p>Diseño minimalista, cerdas suaves sin BPA, buena durabilidad.</p>
+        <a href="https://www.amazon.es/dp/B075V8X3CV?tag=bambugoods-21" target="_blank">Ver en Amazon</a>
+      </div>
+
+      <div class="product">
+        <h3>5. Cepillo ecológico Bambaw</h3>
+        <p>Empaque 100% compostable, opción vegana, viene con cerdas de carbón activado.</p>
+        <a href="https://www.amazon.es/dp/B076FQZ9H1?tag=bambugoods-21" target="_blank">Ver en Amazon</a>
+      </div>
+
+      <p><strong>Consejo:</strong> Recuerda cambiar tu cepillo cada 3 meses y compostar el mango una vez termines su uso.</p>
+    </article>
+  </main>
+
+  <footer>
+    &copy; 2025 BambuGoods. Sitio afiliado a Amazon. Las compras realizadas a través de los enlaces pueden generar comisiones sin coste adicional para ti.
+  </footer>
+</body>
+</html>

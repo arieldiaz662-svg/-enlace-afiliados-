@@ -60,6 +60,27 @@ export const apiService = {
     return response.data;
   },
 
+  // Articles
+  async getArticles(params = {}) {
+    const response = await api.get('/articles', { params });
+    return response.data;
+  },
+
+  async getArticleBySlug(slug, language = 'es') {
+    const response = await api.get(`/articles/${slug}`, { params: { language } });
+    return response.data;
+  },
+
+  async getRelatedArticles(articleId, language = 'es') {
+    const response = await api.get(`/articles/${articleId}/related`, { params: { language } });
+    return response.data;
+  },
+
+  async searchArticles(params = {}) {
+    const response = await api.get('/search/articles', { params });
+    return response.data;
+  },
+
   // Favorites
   async getFavorites(userId) {
     const response = await api.get(`/favorites/${userId}`);

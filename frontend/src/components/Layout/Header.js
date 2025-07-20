@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { categories } from '../../data/mock';
 import { Search, Globe, Menu, X, Leaf } from 'lucide-react';
 
 const Header = () => {
   const { language, toggleLanguage, t } = useLanguage();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -15,6 +17,9 @@ const Header = () => {
     // Mock search functionality - in real app would filter products
     console.log('Searching for:', searchTerm);
   };
+
+  const isActive = (path) => location.pathname === path;
+  const isActiveCategory = (categoryId) => location.pathname.includes(`#${categoryId}`);
 
   return (
     <header className="bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm border-b border-green-100">
@@ -27,7 +32,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="bg-green-600 p-2 rounded-full">
               <Leaf className="h-6 w-6 text-white" />
             </div>
@@ -35,22 +40,39 @@ const Header = () => {
               <h1 className="text-2xl font-bold text-green-700">{t('title')}</h1>
               <p className="text-sm text-green-600 hidden sm:block">{t('subtitle')}</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {currentCategories.map((category) => (
+            <Link
+              to="/"
+              className={`font-medium transition-colors duration-200 hover:underline underline-offset-4 ${
+                isActive('/') ? 'text-green-900 underline' : 'text-green-700 hover:text-green-900'
+              }`}
+            >
+              {language === 'es' ? 'Inicio' : 'Home'}
+            </Link>
+            
+            {currentCategories.slice(0, 4).map((category) => (
               <a
                 key={category.id}
-                href={`#${category.id}`}
-                className="text-green-700 hover:text-green-900 font-medium transition-colors duration-200 hover:underline underline-offset-4"
+                href={`/#${category.id}`}
+                className={`font-medium transition-colors duration-200 hover:underline underline-offset-4 ${
+                  isActiveCategory(category.id) ? 'text-green-900 underline' : 'text-green-700 hover:text-green-900'
+                }`}
               >
                 {category.name}
               </a>
             ))}
-            <a href="#blog" className="text-green-700 hover:text-green-900 font-medium transition-colors duration-200 hover:underline underline-offset-4">
+            
+            <Link
+              to="/blog"
+              className={`font-medium transition-colors duration-200 hover:underline underline-offset-4 ${
+                isActive('/blog') || location.pathname.startsWith('/blog/') ? 'text-green-900 underline' : 'text-green-700 hover:text-green-900'
+              }`}
+            >
               {t('blog')}
-            </a>
+            </Link>
           </nav>
 
           {/* Search and Language */}
@@ -107,23 +129,36 @@ const Header = () => {
 
             {/* Mobile Navigation */}
             <nav className="space-y-2">
+              <Link
+                to="/"
+                className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                  isActive('/') ? 'bg-green-50 text-green-900' : 'text-green-700 hover:bg-green-50'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {language === 'es' ? 'Inicio' : 'Home'}
+              </Link>
+              
               {currentCategories.map((category) => (
                 <a
                   key={category.id}
-                  href={`#${category.id}`}
+                  href={`/#${category.id}`}
                   className="block px-3 py-2 text-green-700 hover:bg-green-50 rounded-md transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {category.name}
                 </a>
               ))}
-              <a
-                href="#blog"
-                className="block px-3 py-2 text-green-700 hover:bg-green-50 rounded-md transition-colors duration-200"
+              
+              <Link
+                to="/blog"
+                className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                  isActive('/blog') || location.pathname.startsWith('/blog/') ? 'bg-green-50 text-green-900' : 'text-green-700 hover:bg-green-50'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('blog')}
-              </a>
+              </Link>
             </nav>
           </div>
         )}

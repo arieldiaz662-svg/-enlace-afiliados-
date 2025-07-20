@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bambugoods - Tu tienda afiliada</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4fdf4;
+      color: #333;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #2d6a4f;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌿 Bienvenido a Bambugoods</h1>
+    <p>Esta es tu tienda de productos afiliados Amazon. Aquí compartirás reseñas, guías y comparativas de productos ecológicos, gadgets y mucho más.</p>
+    <p>🔧 Próximos pasos: Subir contenido, incluir enlaces de afiliado y conectar tu dominio personalizado.</p>
+    <p>Hecho con 💚 desde GitHub Pages.</p>
+  </div>
+</body>
+</html>

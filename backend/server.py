@@ -11,8 +11,10 @@ from contextlib import asynccontextmanager
 from models.product import ProductCreate, ProductUpdate, ProductResponse
 from models.category import CategoryCreate, CategoryResponse
 from models.favorite import FavoriteCreate, FavoriteResponse
+from models.article import ArticleCreate, ArticleResponse, ArticleSummary
 from services.database import db_service
 from services.product_service import product_service
+from services.article_service import article_service
 
 
 ROOT_DIR = Path(__file__).parent
@@ -151,6 +153,73 @@ async def get_categories(language: str = Query("es", description="Language for l
         raise HTTPException(status_code=500, detail="Error retrieving categories")
 
 
+# Articles endpoints
+@api_router.get("/articles", response_model=List[ArticleSummary])
+async def get_articles(
+    category: Optional[str] = Query(None, description="Filter by category"),
+    language: str = Query("es", description="Language for localization"),
+    limit: int = Query(20, ge=1, le=100, description="Number of articles to return"),
+    skip: int = Query(0, ge=0, description="Number of articles to skip")
+):
+    """Get all published articles"""
+    try:
+        articles = await article_service.get_articles(
+            category=category,
+            language=language,
+            limit=limit,
+            skip=skip
+        )
+        return articles
+    except Exception as e:
+        logging.error(f"Error getting articles: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving articles")
+
+
+@api_router.get("/articles/{slug}", response_model=ArticleResponse)
+async def get_article_by_slug(
+    slug: str,
+    language: str = Query("es", description="Language for localization")
+):
+    """Get a specific article by slug"""
+    try:
+        article = await article_service.get_article_by_slug(slug, language)
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+        return article
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting article: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving article")
+
+
+@api_router.get("/articles/{article_id}/related", response_model=List[ArticleSummary])
+async def get_related_articles(
+    article_id: str,
+    language: str = Query("es", description="Language for localization"),
+    limit: int = Query(3, ge=1, le=10, description="Number of related articles to return")
+):
+    """Get related articles by category"""
+    try:
+        # First get the article to find its category
+        article_data = await db_service.find_one("articles", {"_id": ObjectId(article_id)})
+        if not article_data:
+            raise HTTPException(status_code=404, detail="Article not found")
+        
+        related_articles = await article_service.get_related_articles(
+            category=article_data["category"],
+            current_article_id=article_id,
+            language=language,
+            limit=limit
+        )
+        return related_articles
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting related articles: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving related articles")
+
+
 # Favorites endpoints
 @api_router.get("/favorites/{user_id}")
 async def get_user_favorites(user_id: str):
@@ -214,7 +283,7 @@ async def remove_favorite(user_id: str, product_id: str):
         raise HTTPException(status_code=500, detail="Error removing favorite")
 
 
-# Search endpoint
+# Search endpoints
 @api_router.get("/search")
 async def search_products(
     q: str = Query(..., description="Search query"),
@@ -234,6 +303,25 @@ async def search_products(
     except Exception as e:
         logging.error(f"Error searching products: {str(e)}")
         raise HTTPException(status_code=500, detail="Error searching products")
+
+
+@api_router.get("/search/articles")
+async def search_articles(
+    q: str = Query(..., description="Search query"),
+    language: str = Query("es", description="Language for search"),
+    limit: int = Query(10, ge=1, le=50, description="Number of results to return")
+):
+    """Search articles"""
+    try:
+        articles = await article_service.search_articles(
+            query=q,
+            language=language,
+            limit=limit
+        )
+        return articles
+    except Exception as e:
+        logging.error(f"Error searching articles: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error searching articles")
 
 
 # Health check endpoint
@@ -262,3 +350,4 @@ logger = logging.getLogger(__name__)
 
 # Import datetime for favorites
 from datetime import datetime
+from bson import ObjectId
